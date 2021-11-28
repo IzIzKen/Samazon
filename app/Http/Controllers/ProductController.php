@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Category;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use function PHPUnit\Framework\directoryExists;
 
 class ProductController extends Controller
 {
@@ -18,6 +20,23 @@ class ProductController extends Controller
         $products = Product::all();
 
         return view('products.index', compact('products'));
+    }
+
+    /**
+     * @param Product $product
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function favorite(Product $product)
+    {
+        $user = Auth::user();
+
+        if ($user->hasFavorited($product)) {
+            $user->unfavorite($product);
+        } else {
+            $user->favorite($product);
+        }
+
+        return redirect()->route('products.show', $product);
     }
 
     /**
