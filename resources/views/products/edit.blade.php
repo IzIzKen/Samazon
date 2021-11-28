@@ -5,7 +5,7 @@
     <h1>商品情報更新</h1>
 
     <form method="POST" action="/products/{{ $product->id }}">
-        {{ csrf_field() }}
+        @csrf
         <input type="hidden" name="_method" value="PUT">
         <div class="form-group">
             <label for="product-name">商品名</label>
