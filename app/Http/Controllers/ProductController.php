@@ -6,31 +6,51 @@ use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use phpDocumentor\Reflection\Types\Nullable;
 use function PHPUnit\Framework\directoryExists;
 
 class ProductController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
     public function index(Request $request)
     {
+        $sort_query = [];
+        $sorted = "";
+
+        if ($request->direction !==null) {
+            $sort_query = $request->direction;
+            $sorted = $request->sort;
+        } elseif ($request->sort !==null) {
+            $slices = explode('', $request->sort);
+            $sort_query[$slices[0]] = $slices[1];
+            $sorted = $request->sort;
+        }
+
         if ($request->category !== null) {
-            $products = Product::where('category_id', $request->category)->paginate(15);
+            $products = Product::where('category_id', $request->category)->sortable($sort_query)->paginate(15);
             $total_count = Product::where('category_id', $request->category)->count();
             $category = Category::find($request->category);
         } else {
-            $products = Product::paginate(15);
+            $products = Product::sortable($sort_query)->paginate(15);
             $total_count = "";
             $category = null;
         }
 
+        $sort = [
+            '並び替え' => '',
+            '価格の安い順' => 'price asc',
+            '価格の高い順' => 'price desc',
+            '出品の古い順' => 'update_at_asc',
+            '出品の新しい順' => 'update_at_desc',
+        ];
+
         $categories = Category::all();
         $major_category_names = Category::pluck('major_category_name')->unique();//本, コンピュータ, ディスプレイ
 
-        return view('products.index', compact('products', 'category', 'categories', 'major_category_names', 'total_count'));
+        return view('products.index', compact('products', 'category', 'categories', 'major_category_names', 'total_count', 'sort', 'sorted'));
     }
 
     /**

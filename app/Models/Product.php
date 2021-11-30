@@ -5,10 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Overtrue\LaravelFavorite\Traits\Favoriteable;
+use Kyslik\ColumnSortable\Sortable;
 
 class Product extends Model
 {
-    use Favoriteable;
+    use Favoriteable, Sortable;
+
+    public $sortable = [
+        'price',
+        'updated_at'
+    ];
 
     public function category()
     {
