@@ -42,10 +42,17 @@
                         </button>
                     </div>
                     <div class="col-5">
-                        <a href="/products/{{ $product->id }}/favorite" class="btn samazon-favorite-button text-dark w-100">
-                            <i class="fa fa-heart"></i>
-                            お気に入り
-                        </a>
+                        @if($product->isFavoritedBy(Auth::user()))
+                            <a href="/products/{{ $product->id }}/favorite" class="btn samazon-favorite-button text-favorite w-100">
+                                <i class="fa fa-heart"></i>
+                                お気に入り解除
+                            </a>
+                        @else
+                            <a href="/products/{{ $product->id }}/favorite" class="btn samazon-favorite-button text-favorite w-100">
+                                <i class="fa fa-heart"></i>
+                                お気に入り
+                            </a>
+                        @endif
                     </div>
                 </div>
             </form>
@@ -58,7 +65,26 @@
         </div>
 
         <div class="offset-1 col-10">
-            <!-- レビューを実装する箇所になります -->
+            <div class="row">
+                @foreach($reviews as $review)
+                    <div class="offset-md-5 col-md-5">
+                        <p class="h3">{{ $review->content }}</p>
+                        <label>{{ $review->created_at }}</label>
+                    </div>
+                @endforeach
+            </div>
+
+            @auth
+                <div class="row">
+                    <div class="offset-md-5 col-md-5">
+                        <form method="POST" action="/products/{{ $product->id }}/reviews">
+                            @csrf
+                            <textarea name="content" class="form-control m-2"></textarea>
+                            <button type="submit" class="btn samazon-submit-button ml-2">レビューを追加</button>
+                        </form>
+                    </div>
+                </div>
+            @endauth
         </div>
     </div>
 </div>
